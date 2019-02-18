@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- 避免IE使用兼容模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <!-- 视图窗口，移动端特属的标签。 -->
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no" />
+    <!-- 是否启动webapp功能，会删除默认的苹果工具栏和菜单栏。 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- 这个主要是根据实际的页面设计的主体色为搭配来进行设置。 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- 忽略页面中的数字识别为电话号码,email识别 -->
+    <meta name="format-detection" content="telephone=no, email=no" />
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+    <!-- 针对手持设备优化，主要是针对一些老的不识别viewport的浏览器，比如黑莓 -->
+    <meta name="HandheldFriendly" content="true">
+    <!-- 微软的老式浏览器 -->
+    <meta name="MobileOptimized" content="320">
+    <!-- uc强制竖屏 -->
+    <meta name="screen-orientation" content="portrait">
+    <!-- QQ强制竖屏 -->
+    <meta name="x5-orientation" content="portrait">
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- UC应用模式 -->
+    <meta name="browsermode" content="application">
+    <!-- QQ应用模式 -->
+    <meta name="x5-page-mode" content="app">
+    <!-- windows phone 点击无高光 -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- <meta name="viewport" content="width=device-width, viewport-fit=cover"> -->
+    <title>庄园动画场景</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="css/more.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="fonts/iconfont.css">
+</head>
+<body>
+<div id='app' style="width:100%;height: 100vh;overflow: hidden;">
+    <!-- 最外层 -->
+    <div class="wrap" :style="{backgroundImage: 'url(images/theme_'+theme+'/bg.png)'}">
+        <div class="zyt">
+            <!-- 云彩 -->
+            <div class="container" v-if='theme==1'>
+                <div class="cloud clou">
+                    <div class="one"></div>
+                    <div class="two"></div>
+                    <div class="thr"></div>
+                    <div class="fou"></div>
+                </div>
+                <div class="cloud clouds">
+                    <div class="one"></div>
+                    <div class="two"></div>
+                    <div class="thr"></div>
+                    <div class="fou"></div>
+                </div>
+                <div class="cloud clouds-on">
+                    <div class="one"></div>
+                    <div class="two"></div>
+                    <div class="thr"></div>
+                    <div class="fou"></div>
+                </div>
+            </div>
+            <!-- 云彩 -->
+            <div v-if='theme==2'>
+                <div class="start" :style='{left: item.x+"%", top: item.y+"%", opacity: item.opacity, animationDelay: (-item.y-item.x)+"s"}' v-for='(item,index) in start_list'></div>
+            </div>
+        </div>
+        <!-- 风塔 -->
+        <div class="wind container" style=" position: fixed; top: 44.427%;  left: 14.81%; width: 20%;  transform: translate(-50%,-50%);">
+            <img class="im" src="images/6.png" alt=""style="width: 100%" >
+        </div>
+        <!-- 风车 -->
+        <div class="windmill" style="position: fixed; top: 42.23%;left: 83.70%; width: 14%;transform: translate(-50%,-50%);">
+            <img class="mill" :src="'images/theme_'+theme+'/windmill.png'" alt=" " style="width: 100%">
+        </div>
+        <!-- 进度条 -->
+        <div class="jindu" v-if='chicken_main.times'>
+            <img src="images/jindutiao.png" alt="">
+            <div class="jindu-time">{{chicken_main.times}}</div>
+        </div>
+
+        <!-- 鸡蛋 -->
+        <div class="egg" :style="{animation: resources.Waiting_egg?'':'none'}" @click='resources.Waiting_egg?stealEgg():""'>
+            <img :src="resources.Waiting_egg?'images/45.png':'images/46.png'" alt="">
+            <div class="egg-number" v-if='resources.Waiting_egg'>{{resources.Waiting_egg}}</div>
+        </div>
+        <!-- 拾取鸡蛋动画 -->
+        <div class="egg-collect-view" v-if='resources.Waiting_egg'>
+            <div class="egg-collect egg-collect1">
+                <img src="images/egg.png" class="egg-collect-img">
+            </div>
+            <div class="egg-collect egg-collect2">
+                <img src="images/egg.png" class="egg-collect-img">
+            </div>
+            <div class="egg-collect egg-collect3">
+                <img src="images/egg.png" class="egg-collect-img">
+            </div>
+        </div>
+        <!-- 三只小 chick -->
+        <div class="chook">
+            <img :src="'images/chick_'+item.type+'/'+(item.is_sleep?'sleep':'small')+'.gif'" alt="" class="chook-1" :style="{position:'fixed',top:(item.y+55)+'%',left:item.x+'%',transform:'scale('+(item.y/10+1)+')',animationDelay: (-item.x-item.y)+'s', zIndex: parseInt(item.y*100), animationName: item.is_sleep?'':'chookMove'}" v-for='(item,index) of chick_list'>
+        </div>
+        <!-- 蜜蜂采蜜 -->
+        <div class="bee-box">
+            <div class="soil two"></div>
+            <div class="soil"></div>
+            <div class="flowerpot">
+                <div class="flowerpot-top"></div>
+                <div class="flowerpot-bottom"></div>
+            </div>
+            <div class="flower">
+                <div class="flower-top">
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+                <div class="flower-head"></div>
+            </div>
+            <div class="bee">
+                <div class="bee-body"></div>
+            </div>
+            <div class="bee bee-2">
+                <div class="bee-body"></div>
+            </div>
+            <div class="triangle-box two">
+                <div class="item"></div>
+                <div class="item"></div>
+                <div class="item"></div>
+            </div>
+        </div>
+        <!-- 小狗 -->
+        <div class="dog" v-if='dog.dog_id' style="bottom: 2rem; right: 50%; transform: translate(50%);z-index: 7;">
+            <img :src="'images/dog/run_'+dog.dog_level+'.gif'" alt="">
+        </div>
+        <!-- 宠粮 -->
+        <div class="food">
+            <!-- 正在进食 -->
+            <!-- <img src="images/5.gif" alt="" v-if='chicken_main.status==1'> -->
+            <!-- 有食物 -->
+            <img src="images/feed_1.png" alt="" v-if='resources.feed>0'>
+            <!-- 无食物 -->
+            <img src="images/feed_0.png" alt="" v-else>
+            <!-- 饲料数量 -->
+            <div class="feed-number justify-center" v-if='resources.feed>0'>{{resources.feed}}</div>
+        </div>
+
+        <!-- 主页按钮 -->
+        <div class="lf">
+            <div class="ppx" id="header">
+                <div class="ppx">
+                    <div class="content" onclick="closeWin()"><i class="iconfont icon-back"></i><b>BLOCK CHICKEN</b></div>
+                </div>
+            </div>
+
+
+            <div class="ais justify-center">
+                <div class="foot flex-column justify-center" @click="stealEgg()">
+                    <img src="img/index9.png" alt="">
+                    <b>Steal an egg</b>
+                </div>
+            </div>
+
+        </div>
+        <!-- ...蒙层... -->
+        <div class="mc"></div>
+        <div class="mc-1"></div>
+
+    </div>
+
+    <!-- 购买food成功弹窗 -->
+    <div class="popup-h">
+        <img class="txj-6" src="images/eggs_steal.png" alt="">
+        <img class="txj-b" src="img/hua-a.png" alt="">
+        <img class="txj-c" src="img/hua-b.png" alt="">
+        <div class="txj-d"></div>
+    </div>
+    <!-- 公告 -->
+    <div class="offiche of">
+
+        <div class="off">
+            <div>NORICE </div>
+            <img src="img/dj1.png" alt="" class="">
+        </div>
+        <div class="offiche-1" v-html='announcement.content' v-if='announcement.content'>
+            <!-- <div class="yingyu">
+                <h5>Notice:</h5>
+                <p>1 .Due to the large number of global feedback and the limited number of places, many excellent
+                    leaders did not register in time. Now we close the registration window and delete the changes
+                    of the applicants after verification and screening, and wait for further notice.</p>
+                <p>2 .Customer service in all countries of the world works according to local time, ranging from
+                    10:00 to 18.00.</p>
+                <p>3 .The network may be unstable in the last week. The Technology Department is docking with the
+                    smart dog. </p>
+            </div>
+            <div class="offiche-2">
+                <h5>通知：</h5>
+                <p>1 .由于全球反馈人数太多,名额有限,导致很多优秀的领导人没有及时报名.现关闭报名窗口并对报名人员经行核实筛选后进行更改剔除，具体事宜等待另行通知。</p>
+                <p>2 .全球各国客服按当地时间工作，时间为10:00-18.00。</p>
+                <p>3 .最近一周内网络可能会出现不稳定，技术部正在对接智能狗事宜。</p>
+            </div>
+            <span>VCW运营</span>
+            <div class="offiche-3">
+                <h5>通知：</h5>
+                <p>1 .全世界のフィードバック人数が多すぎて、名額が限られているため、多くの優秀な指導者が応募していないことを招いています。</p>
+                <p>2 .世界各国の客服は現地時間で働いています。時間は10 : 00- 18です。</p>
+                <p>3 .最近1週間以内にネットワークが不安定になるかもしれませんが、技術部はスマートな犬に接しています。</p>
+            </div>
+            <span>VCW运营</span> -->
+        </div>
+    </div>
+    <!-- 遮盖动画的云 -->
+    <div class="cloud-cover">
+        <img :src="'images/theme_'+theme+'/cloud/cloud_1.png'" class="cloud-img1">
+        <img :src="'images/theme_'+theme+'/cloud/cloud_2.png'" class="cloud-img2">
+    </div>
+    <!-- loading动画 -->
+    <div class="loading-cover justify-center" v-show='resources.id'>
+        <div class="loading-view">
+            <i class="iconfont icon-loading"></i>
+        </div>
+    </div>
+
+</div>
+<!-- loading动画 -->
+<div class="main-loading-cover justify-center">
+    <img src="images/loading.gif">
+</div>
+</body>
+<script src="js/iscroll.js"></script>
+<script src="js/jquery.min.js"></script>
+<!-- <script src="js/bootstrap.js"></script> -->
+<script src="js/base.js"></script>
+<script src="js/api.js"></script>
+<script src="js/appapi.js"></script>
+<script src="js/vue.min.js"></script>
+
+<script type="text/javascript">
+var app = new Vue({
+    el: "#app",
+    click: true,
+    data: {
+        resources: {
+            // Waiting_egg:9,
+        }, // 用户信息
+        friends_list: [], // 用户好友列表
+        announcement: {}, // 公告
+        chicken_main: {}, // 主要的小鸡
+        chick_list: [], // 次要的小鸡
+        dog: {}, // 用户的狗
+        dog_shop_list: [], // 商店里狗的列表
+        chick_shop_list: [], // 商店里鸡的列表
+        feed_shop_list: [], // 商店里饲料的列表
+        theme: 1, // 场景（白天黑夜）
+        start_list: [], // 夜晚的星星
+        account:{
+            "balance_id": "",
+            "balance_name": "",
+            "balance_images": "",
+            "is_withdraw": "0",
+            "is_deposit": "",
+            "withdraw_fee": "0.00",
+            "is_into": "0",
+            "is_transfer": "0",
+            "is_roll": "0",
+            "ratio": "",
+            "balance": "",
+            "frozen": ""
+        }
+    },
+    methods: {
+        // 请求用户信息
+        GetFriendsInfo: function(){
+            var that = this
+            GetApi('Friends/info',{},function(data){
+                that.resources = data;
+                if(data.account.length>0){
+                    for (var i = 0,len = data.account.length; i < len; i++) {
+                        if(data.account[i].balance_id==3){
+                            that.account = data.account[i];
+                        }
+                    }
+                }
+                // that.dog = {dog_id:1,dog_level: 1}
+                if(data.dog && data.dog.length>0){
+                    that.dog = data.dog
+                }
+                if(data.animal.length>0){
+                    for (var i = 0,len = data.animal.length; i < len; i++) {
+                        data.animal[i].x = Math.random()*100;
+                        data.animal[i].y = Math.random()*10;
+                    }
+                    that.chick_list = data.animal
+                }
+                that.theme = data.theme||1
+                if (that.theme==2) { // 夜晚（星星）
+                    var start_list = []
+                    for (var i = 0; i < 20; i++) {
+                        start_list.push({
+                            x: Math.random()*100,
+                            y: Math.random()*60,
+                            opacity: Math.random(),
+                        })
+                    }
+                    that.start_list = start_list
+                }
+            })
+        },
+        // 偷蛋
+        stealEgg: function(){
+            var that = this
+
+            cloudShow(function(){
+                GetApi('Friends/steal',{},function(data){
+                    $(".popup-h .txj-d").html('Congratulations on getting '+data.steal_egg+' eggs')
+                    $(".popup-h").show();
+                    
+                    that.GetFriendsInfo()
+                    $('.cloud-cover').removeClass('active');
+                },function(){
+                    $('.cloud-cover').removeClass('active')
+                })
+            })
+        },
+    }
+});
+function _init() {
+
+    app.GetFriendsInfo();
+
+}
+apiready = function () {
+    $api.fixStatusBar($api.dom('#header'));
+    api.addEventListener({
+        name:'viewappear'
+    }, function(ret, err){
+        app.GetFriendsInfo()
+    });
+    setTimeout(
+        function () {
+            $('.main-loading-cover').hide();
+        },2000
+    )
+    _init();
+}
+
+</script>
+<script src="js/index.js"></script>
+</html>
